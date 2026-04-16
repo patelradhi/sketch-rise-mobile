@@ -5,17 +5,25 @@
 @import 'nativewind/theme';
 
 @theme {
-	--color-background: #fff9e3;
-	--color-foreground: #081126;
-	--color-card: #fff8e7;
-	--color-muted: #f6eecf;
-	--color-muted-foreground: rgba(0, 0, 0, 0.6);
-	--color-primary: #081126;
-	--color-accent: #ea7a53;
-	--color-border: rgba(0, 0, 0, 0.1);
+	--color-background: #0a0900;
+	--color-foreground: #f5f0e8;
+	--color-card: #141200;
+	--color-muted: #1c1a0f;
+	--color-muted-foreground: rgba(245, 240, 232, 0.5);
+	--color-primary: #f5f0e8;
+	--color-accent: #f59e0b;
+	--color-accent-soft: rgba(245, 158, 11, 0.12);
+	--color-border: rgba(245, 158, 11, 0.15);
 	--color-success: #16a34a;
 	--color-destructive: #dc2626;
 	--color-subscription: #8fd1bd;
+
+	--font-sans: 'sans-regular';
+	--font-thin: 'sans-light';
+	--font-label: 'sans-medium';
+	--font-emphasis: 'sans-semibold';
+	--font-heading: 'sans-bold';
+	--font-display: 'sans-extrabold';
 
 	--spacing-0: 0px;
 	--spacing-1: 4px;
@@ -39,6 +47,114 @@
 }
 
 @layer components {
+	/* ── Layout ── */
+	.auth-safe-area {
+		@apply flex-1 bg-background;
+	}
+
+	.auth-screen {
+		@apply flex-1 bg-background justify-center px-6;
+	}
+
+	/* ── Logo & Branding ── */
+	.auth-logo-mark {
+		@apply relative size-10 items-center justify-center rounded-xl bg-accent;
+	}
+
+	.auth-logo-mark-text {
+		@apply text-lg font-display text-background;
+	}
+
+	.auth-wordmark {
+		@apply text-3xl font-display text-primary;
+	}
+
+	.auth-wordmark-sub {
+		@apply -mt-1 text-xs font-emphasis uppercase tracking-[1px] text-muted-foreground;
+	}
+
+	/* ── Typography ── */
+	.auth-title {
+		@apply text-3xl font-heading text-primary;
+	}
+
+	.auth-subtitle {
+		@apply mt-2 max-w-[320px] text-center text-base font-label text-muted-foreground;
+	}
+
+	.heading-hero {
+		@apply text-3xl font-heading text-primary text-center;
+	}
+
+	.text-body {
+		@apply text-sm font-sans text-muted-foreground;
+	}
+
+	.text-label {
+		@apply text-xs font-label text-muted-foreground;
+	}
+
+	/* ── Inputs ── */
+	.input-field {
+		@apply border border-border rounded-xl px-4 py-3 mb-3 text-primary font-sans;
+	}
+
+	.input-code {
+		@apply border border-border rounded-xl px-4 py-3 mb-3 text-primary text-center text-2xl tracking-widest font-heading;
+	}
+
+	/* ── Buttons ── */
+	.btn-primary {
+		@apply bg-accent rounded-xl py-4 items-center;
+	}
+
+	.btn-primary-text {
+		@apply text-background text-base font-heading;
+	}
+
+	.btn-outline {
+		@apply rounded-xl py-4 items-center border border-border;
+	}
+
+	.btn-outline-text {
+		@apply text-primary text-base font-emphasis;
+	}
+
+	.btn-link-text {
+		@apply text-accent font-emphasis;
+	}
+
+	/* ── Cards & Surfaces ── */
+	.card-surface {
+		@apply bg-card rounded-2xl py-5 px-6;
+	}
+
+	.stat-value {
+		@apply text-accent text-2xl font-heading;
+	}
+
+	.stat-label {
+		@apply text-muted-foreground text-xs mt-1 font-sans;
+	}
+
+	.badge-pill {
+		@apply self-center rounded-full bg-muted px-4 py-2;
+	}
+
+	.badge-pill-text {
+		@apply text-accent text-xs font-label;
+	}
+
+	.divider-vertical {
+		@apply w-px bg-border self-stretch;
+	}
+
+	/* ── Errors ── */
+	.error-text {
+		@apply text-destructive text-sm mb-3 font-sans;
+	}
+
+	/* ── Tabs ── */
 	.tabs-icon {
 		@apply size-12 items-center justify-center;
 	}
@@ -53,5 +169,23 @@
 
 	.tabs-glyph {
 		@apply size-6;
+	}
+
+	/* ── Cancel / Subscription ── */
+	.sub-cancel {
+		@apply mt-2 items-center rounded-full bg-primary py-4;
+	}
+
+	.sub-cancel-disabled {
+		@apply bg-primary/35;
+	}
+
+	.sub-cancel-text {
+		@apply font-heading text-background;
+	}
+
+	/* ── Empty States ── */
+	.home-empty-state {
+		@apply py-4 text-sm font-label text-primary/60;
 	}
 }
