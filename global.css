@@ -95,12 +95,15 @@
 	}
 
 	/* ── Inputs ── */
+	/* NOTE: No font-* utilities on TextInput — react-native-css crashes
+	   when processing font-family on native TextInput. Use inline
+	   style={{ fontFamily: 'sans-regular' }} on TextInput instead. */
 	.input-field {
-		@apply border border-border rounded-xl px-4 py-3 mb-3 text-primary font-sans;
+		@apply border border-border rounded-xl px-4 py-3 mb-3 text-primary;
 	}
 
 	.input-code {
-		@apply border border-border rounded-xl px-4 py-3 mb-3 text-primary text-center text-2xl tracking-widest font-heading;
+		@apply border border-border rounded-xl px-4 py-3 mb-3 text-primary text-center text-2xl tracking-widest;
 	}
 
 	/* ── Buttons ── */
@@ -187,5 +190,75 @@
 	/* ── Empty States ── */
 	.home-empty-state {
 		@apply py-4 text-sm font-label text-primary/60;
+	}
+
+	/* ── Tab Screens ── */
+	.tab-screen {
+		@apply flex-1 bg-background px-6 pt-14;
+	}
+
+	.tab-title {
+		@apply text-2xl font-heading text-primary;
+	}
+
+	/* ── User Avatar ── */
+	.user-avatar {
+		@apply size-9 rounded-full bg-accent items-center justify-center;
+	}
+
+	.user-avatar-text {
+		@apply text-sm font-heading text-background;
+	}
+
+	/* ── Navigation Links ── */
+	.nav-link {
+		@apply text-xs font-label text-muted-foreground;
+	}
+
+	.nav-link-active {
+		@apply text-xs font-emphasis text-accent;
+	}
+
+	/* ── User Menu Dropdown ── */
+	.user-menu {
+		@apply absolute right-0 top-12 bg-card rounded-xl py-2 px-1 border border-border z-50;
+	}
+
+	.user-menu-item {
+		@apply flex-row items-center gap-2 px-4 py-3 rounded-lg;
+	}
+
+	.user-menu-text {
+		@apply text-sm font-label text-primary;
+	}
+
+	/* ── Upload Card ── */
+	.upload-card {
+		@apply bg-card rounded-2xl p-6 mt-6 items-center;
+	}
+
+	.upload-icon-circle {
+		@apply size-14 rounded-2xl bg-accent-soft items-center justify-center mb-4;
+	}
+
+	.upload-title {
+		@apply text-lg font-heading text-primary mb-1;
+	}
+
+	.upload-hint {
+		@apply text-xs font-label text-muted-foreground mb-5;
+	}
+
+	.upload-preview {
+		@apply w-full rounded-xl overflow-hidden mb-4;
+	}
+
+	/* ── Sign In Button (landing header) ── */
+	.btn-signin {
+		@apply rounded-lg bg-accent px-4 py-2 items-center;
+	}
+
+	.btn-signin-text {
+		@apply text-xs font-emphasis text-background;
 	}
 }

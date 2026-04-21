@@ -1,30 +1,73 @@
 import { useSignUp } from '@clerk/expo/legacy';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
-import type { ClerkAPIError, SignUpFormState } from '@/types';
+import type { ClerkAPIError } from '@/types';
+import { inputFieldStyle, inputCodeStyle, PLACEHOLDER_COLOR } from '@/constants/styles';
+
+interface SignUpForm {
+	emailAddress: string;
+	password: string;
+	code: string;
+	phase: 'form' | 'verify';
+	error: string | null;
+	emailError: string | null;
+	passwordError: string | null;
+	submitting: boolean;
+}
 
 export default function SignUp() {
 	const { signUp, setActive, isLoaded } = useSignUp();
 	const router = useRouter();
 
-	const [form, setForm] = useState<SignUpFormState>({
+	const [form, setForm] = useState<SignUpForm>({
 		emailAddress: '',
 		password: '',
 		code: '',
 		phase: 'form',
 		error: null,
+		emailError: null,
+		passwordError: null,
 		submitting: false,
 	});
 
-	const updateForm = (updates: Partial<SignUpFormState>) =>
+	const [showPassword, setShowPassword] = useState(false);
+
+	const updateForm = (updates: Partial<SignUpForm>) =>
 		setForm((prev) => ({ ...prev, ...updates }));
+
+	const validate = (): boolean => {
+		let emailError: string | null = null;
+		let passwordError: string | null = null;
+
+		const trimmed = form.emailAddress.trim();
+		if (!trimmed) {
+			emailError = 'Email is required';
+		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+			emailError = 'Enter a valid email address';
+		}
+
+		if (!form.password) {
+			passwordError = 'Password is required';
+		} else if (form.password.length < 8) {
+			passwordError = 'Password must be at least 8 characters';
+		}
+
+		updateForm({ emailError, passwordError });
+		return !emailError && !passwordError;
+	};
 
 	const onCreate = async () => {
 		if (!isLoaded) return;
+		if (!validate()) return;
+
 		updateForm({ error: null, submitting: true });
 		try {
-			await signUp.create({ emailAddress: form.emailAddress, password: form.password });
+			await signUp.create({
+				emailAddress: form.emailAddress.trim().toLowerCase(),
+				password: form.password,
+			});
 			await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
 			updateForm({ phase: 'verify' });
 		} catch (err) {
@@ -44,7 +87,7 @@ export default function SignUp() {
 			const attempt = await signUp.attemptEmailAddressVerification({ code: form.code });
 			if (attempt.status === 'complete') {
 				await setActive({ session: attempt.createdSessionId });
-				router.replace('/home');
+				router.back();
 			} else {
 				updateForm({ error: 'Verification incomplete. Check the code and try again.' });
 			}
@@ -62,34 +105,79 @@ export default function SignUp() {
 		<View className="auth-screen">
 			{form.phase === 'form' ? (
 				<>
-					<Text className="auth-title mb-8">Create account</Text>
+					{/* Logo */}
+					<View className="items-center mb-10">
+						<View className="flex-row items-center gap-3 mb-1">
+							<View className="auth-logo-mark">
+								<Text className="auth-logo-mark-text">S</Text>
+							</View>
+							<Text className="auth-wordmark">SketchRise</Text>
+						</View>
+						<Text className="auth-wordmark-sub">CREATIVE SKETCHING</Text>
+					</View>
 
+					{/* Heading */}
+					<View className="items-center mb-8">
+						<Text className="auth-title">Create your account</Text>
+						<Text className="auth-subtitle">
+							Start sketching and bring your ideas to life
+						</Text>
+					</View>
+
+					{/* Email */}
+					<Text className="text-label mb-1 ml-1">Email Address</Text>
 					<TextInput
-						className="input-field"
-						placeholder="Email"
-						placeholderTextColor="rgba(245,240,232,0.3)"
+						style={inputFieldStyle}
+						placeholder="name@example.com"
+						placeholderTextColor={PLACEHOLDER_COLOR}
 						autoCapitalize="none"
 						keyboardType="email-address"
 						value={form.emailAddress}
-						onChangeText={(v) => updateForm({ emailAddress: v })}
+						onChangeText={(v) => updateForm({ emailAddress: v, emailError: null })}
 					/>
-					<TextInput
-						className="input-field"
-						placeholder="Password"
-						placeholderTextColor="rgba(245,240,232,0.3)"
-						secureTextEntry
-						value={form.password}
-						onChangeText={(v) => updateForm({ password: v })}
-					/>
+					{form.emailError && <Text className="error-text">{form.emailError}</Text>}
 
+					{/* Password */}
+					<Text className="text-label mb-1 ml-1">Password</Text>
+					<View className="relative">
+						<TextInput
+							style={{ ...inputFieldStyle, paddingRight: 48 }}
+							placeholder="Create a strong password"
+							placeholderTextColor={PLACEHOLDER_COLOR}
+							secureTextEntry={!showPassword}
+							value={form.password}
+							onChangeText={(v) => updateForm({ password: v, passwordError: null })}
+						/>
+						<Pressable
+							onPress={() => setShowPassword(!showPassword)}
+							className="absolute right-4 top-3"
+						>
+							<Ionicons
+								name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+								size={22}
+								color="rgba(245,240,232,0.4)"
+							/>
+						</Pressable>
+					</View>
+					<Text className="text-label ml-1 -mt-1 mb-3">Minimum 8 characters required</Text>
+					{form.passwordError && <Text className="error-text">{form.passwordError}</Text>}
+
+					{/* Server error */}
 					{form.error && <Text className="error-text">{form.error}</Text>}
 
-					<Pressable onPress={onCreate} disabled={form.submitting} className="btn-primary mb-4">
+					{/* Submit */}
+					<Pressable
+						onPress={onCreate}
+						disabled={form.submitting}
+						className="btn-primary mb-4"
+						style={form.submitting ? { opacity: 0.6 } : undefined}
+					>
 						<Text className="btn-primary-text">
-							{form.submitting ? 'Creating…' : 'Create Account'}
+							{form.submitting ? 'Creating\u2026' : 'Create Account'}
 						</Text>
 					</Pressable>
 
+					{/* Sign-in link */}
 					<Pressable onPress={() => router.replace('/sign-in')} className="flex-row justify-center">
 						<Text className="text-body">Already have an account? </Text>
 						<Text className="btn-link-text">Sign in</Text>
@@ -103,9 +191,9 @@ export default function SignUp() {
 					</Text>
 
 					<TextInput
-						className="input-code"
+						style={inputCodeStyle}
 						placeholder="123456"
-						placeholderTextColor="rgba(245,240,232,0.3)"
+						placeholderTextColor={PLACEHOLDER_COLOR}
 						keyboardType="number-pad"
 						maxLength={6}
 						value={form.code}
@@ -114,9 +202,14 @@ export default function SignUp() {
 
 					{form.error && <Text className="error-text">{form.error}</Text>}
 
-					<Pressable onPress={onVerify} disabled={form.submitting} className="btn-primary">
+					<Pressable
+						onPress={onVerify}
+						disabled={form.submitting}
+						className="btn-primary"
+						style={form.submitting ? { opacity: 0.6 } : undefined}
+					>
 						<Text className="btn-primary-text">
-							{form.submitting ? 'Verifying…' : 'Verify'}
+							{form.submitting ? 'Verifying\u2026' : 'Verify'}
 						</Text>
 					</Pressable>
 				</>
