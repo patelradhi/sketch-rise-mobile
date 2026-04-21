@@ -1,4 +1,4 @@
-import { ClerkProvider } from '@clerk/expo';
+import { ClerkProvider, useAuth } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
 import {
 	PlusJakartaSans_300Light,
@@ -12,6 +12,15 @@ import { useFonts } from 'expo-font';
 import { Slot, SplashScreen } from 'expo-router';
 import { useEffect } from 'react';
 import '@/global.css';
+import { setAuthTokenGetter } from '@/lib/api';
+
+function AuthTokenBridge() {
+	const { getToken } = useAuth();
+	useEffect(() => {
+		setAuthTokenGetter(() => getToken());
+	}, [getToken]);
+	return null;
+}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,6 +50,7 @@ export default function RootLayout() {
 
 	return (
 		<ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+			<AuthTokenBridge />
 			<Slot />
 		</ClerkProvider>
 	);
