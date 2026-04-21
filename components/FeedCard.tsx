@@ -17,7 +17,7 @@ export function FeedCard({ job }: Props) {
 	const router = useRouter();
 
 	return (
-		<Pressable className="feed-card" onPress={() => router.push(`/result/${job.id}`)}>
+		<Pressable className="feed-card" onPress={() => router.push(`/result/${job.id}` as never)}>
 			<View className="feed-thumb">
 				{job.generated3dUrl ? (
 					<Image

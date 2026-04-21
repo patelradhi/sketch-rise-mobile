@@ -59,7 +59,7 @@ export function useFloorPlanJob() {
 						if (latest.status === 'completed') {
 							clearPolling();
 							setStatus('completed');
-							router.push(`/result/${latest.id}`);
+							router.push(`/result/${latest.id}` as never);
 						} else if (latest.status === 'failed') {
 							clearPolling();
 							setStatus('failed');
