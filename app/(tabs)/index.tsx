@@ -13,13 +13,16 @@
 
 import { useAuth, useClerk, useUser } from '@clerk/expo';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { styled } from 'nativewind';
+import { useFloorPlanJob } from '@/hooks/useFloorPlanJob';
+import { useMyFloorPlans } from '@/hooks/useMyFloorPlans';
+import { GeneratingOverlay } from '@/components/GeneratingOverlay';
+import { FeedCard } from '@/components/FeedCard';
 
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -31,7 +34,21 @@ export default function Home() {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+	const { start, reset, status, error } = useFloorPlanJob();
+	const { items: feedItems, refresh: refreshFeed } = useMyFloorPlans();
+	const isGenerating = status === 'uploading' || status === 'generating';
+
+	useEffect(() => {
+		if (status === 'completed') void refreshFeed();
+	}, [status, refreshFeed]);
+
 	const pickImage = async () => {
+		if (!isSignedIn) {
+			router.push('/sign-in');
+			return;
+		}
+		if (isGenerating) return;
+
 		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ['images'],
 			allowsEditing: true,
@@ -40,13 +57,17 @@ export default function Home() {
 
 		if (!result.canceled && result.assets[0]) {
 			const asset = result.assets[0];
-			// Check file size (~10 MB limit)
-			if (asset.fileSize && asset.fileSize > 10 * 1024 * 1024) {
-				Alert.alert('File too large', 'Please select an image under 10 MB.');
+			if (asset.fileSize && asset.fileSize > 50 * 1024 * 1024) {
+				Alert.alert('File too large', 'Please select an image under 50 MB.');
 				return;
 			}
 			setSelectedImage(asset.uri);
+			await start(asset.uri);
 		}
+	};
+
+	const retry = () => {
+		if (selectedImage) void start(selectedImage);
 	};
 
 	if (!isLoaded) {
@@ -183,47 +204,32 @@ export default function Home() {
 					<Ionicons name="layers-outline" size={28} color="#f59e0b" />
 				</View>
 				<Text className="upload-title">Upload your floor plan</Text>
-				<Text className="upload-hint">Supports JPG, PNG — max 10 MB</Text>
+				<Text className="upload-hint">Supports JPG, PNG — max 50 MB</Text>
 
-				{selectedImage ? (
-					<>
-						<View className="upload-preview">
-							<Image
-								source={{ uri: selectedImage }}
-								style={{ width: '100%', height: 200 }}
-								contentFit="cover"
-							/>
-						</View>
-						<View className="flex-row gap-3 w-full">
-							<Pressable
-								className="flex-1 btn-outline"
-								onPress={() => setSelectedImage(null)}
-							>
-								<Text className="btn-outline-text">Remove</Text>
+				{isGenerating && selectedImage ? (
+					<GeneratingOverlay sourceUri={selectedImage} />
+				) : status === 'failed' ? (
+					<View className="upload-dashed">
+						<Ionicons name="alert-circle-outline" size={24} color="#f59e0b" />
+						<Text className="error-text mt-2 text-center">
+							{error ?? 'Generation failed'}
+						</Text>
+						<View className="flex-row gap-3 w-full mt-3">
+							<Pressable className="flex-1 btn-outline" onPress={reset}>
+								<Text className="btn-outline-text">Cancel</Text>
 							</Pressable>
-							<Pressable className="flex-1 btn-primary" onPress={pickImage}>
-								<Text className="btn-primary-text">Replace</Text>
+							<Pressable className="flex-1 btn-primary" onPress={retry}>
+								<Text className="btn-primary-text">Retry</Text>
 							</Pressable>
 						</View>
-					</>
+					</View>
 				) : (
-					<Pressable
-						onPress={pickImage}
-						style={{
-							borderWidth: 2,
-							borderColor: 'rgba(245, 158, 11, 0.2)',
-							borderStyle: 'dashed',
-							borderRadius: 16,
-							width: '100%',
-							paddingVertical: 32,
-							alignItems: 'center',
-						}}
-					>
+					<Pressable onPress={pickImage} className="upload-dashed">
 						<View className="size-12 rounded-full bg-muted items-center justify-center mb-3">
 							<Ionicons name="cloud-upload-outline" size={24} color="rgba(245, 240, 232, 0.5)" />
 						</View>
 						<Text className="text-sm font-emphasis text-primary mb-1">
-							Tap to upload
+							Tap to upload a 2D floor plan
 						</Text>
 						<Text className="text-xs font-sans text-muted-foreground">
 							Select from your gallery
@@ -231,6 +237,24 @@ export default function Home() {
 					</Pressable>
 				)}
 			</View>
+
+			{/* ── Projects Feed ── */}
+			{isSignedIn && (
+				<View className="mt-8">
+					<Text className="tab-title mb-1">Projects</Text>
+					<Text className="text-body mb-4">
+						Your latest work, all in one place.
+					</Text>
+
+					{feedItems.length === 0 ? (
+						<Text className="home-empty-state text-center">
+							No projects yet. Upload a 2D floor plan to get started.
+						</Text>
+					) : (
+						feedItems.map((job) => <FeedCard key={job.id} job={job} />)
+					)}
+				</View>
+			)}
 			</ScrollView>
 		</SafeAreaView>
 	);
