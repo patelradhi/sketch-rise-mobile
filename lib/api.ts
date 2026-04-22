@@ -21,6 +21,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
 
 	const headers: Record<string, string> = {
 		'Content-Type': 'application/json',
+		'ngrok-skip-browser-warning': 'true',
 		...(init.headers as Record<string, string> | undefined),
 	};
 	if (token) headers.Authorization = `Bearer ${token}`;

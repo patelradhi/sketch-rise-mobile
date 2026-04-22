@@ -1,6 +1,7 @@
+import { useAuth } from '@clerk/expo';
 import { useSignUp } from '@clerk/expo/legacy';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import type { ClerkAPIError } from '@/types';
@@ -18,8 +19,13 @@ interface SignUpForm {
 }
 
 export default function SignUp() {
+	const { isSignedIn } = useAuth();
 	const { signUp, setActive, isLoaded } = useSignUp();
 	const router = useRouter();
+
+	if (isSignedIn) {
+		return <Redirect href="/(tabs)" />;
+	}
 
 	const [form, setForm] = useState<SignUpForm>({
 		emailAddress: '',

@@ -12,9 +12,10 @@
  * email verification or 2FA enabled for sign-in.
  */
 
+import { useAuth } from '@clerk/expo';
 import { useSignIn } from '@clerk/expo/legacy';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import type { ClerkAPIError } from '@/types';
@@ -32,8 +33,13 @@ interface SignInForm {
 }
 
 export default function SignIn() {
+	const { isSignedIn } = useAuth();
 	const { signIn, setActive, isLoaded } = useSignIn();
 	const router = useRouter();
+
+	if (isSignedIn) {
+		return <Redirect href="/(tabs)" />;
+	}
 
 	const [form, setForm] = useState<SignInForm>({
 		emailAddress: '',

@@ -22,6 +22,10 @@ function AuthTokenBridge() {
 	return null;
 }
 
+export const unstable_settings = {
+	initialRouteName: '(tabs)',
+};
+
 SplashScreen.preventAutoHideAsync();
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;

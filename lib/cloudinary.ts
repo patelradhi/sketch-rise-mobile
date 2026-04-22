@@ -20,10 +20,12 @@ export async function uploadToCloudinary(localUri: string): Promise<CloudinaryUp
 		body: form,
 	});
 
+	const text = await res.text();
 	if (!res.ok) {
-		throw new Error(`Cloudinary upload failed: ${res.status}`);
+		console.error('[cloudinary]', res.status, text);
+		throw new Error(`Cloudinary upload failed (${res.status}): ${text}`);
 	}
 
-	const json = (await res.json()) as { secure_url: string; public_id: string };
+	const json = JSON.parse(text) as { secure_url: string; public_id: string };
 	return { secure_url: json.secure_url, public_id: json.public_id };
 }
