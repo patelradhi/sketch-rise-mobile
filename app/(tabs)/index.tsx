@@ -16,7 +16,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { styled } from 'nativewind';
 import { useFloorPlanJob } from '@/hooks/useFloorPlanJob';
@@ -35,7 +35,7 @@ export default function Home() {
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
 	const { start, reset, status, error } = useFloorPlanJob();
-	const { items: feedItems, refresh: refreshFeed } = useMyFloorPlans();
+	const { items: feedItems, loading: feedLoading, refresh: refreshFeed } = useMyFloorPlans();
 	const isGenerating = status === 'uploading' || status === 'generating';
 
 	useEffect(() => {
@@ -246,12 +246,19 @@ export default function Home() {
 						Your latest work, all in one place.
 					</Text>
 
-					{feedItems.length === 0 ? (
+					{feedLoading && feedItems.length === 0 ? (
+						<View className="py-10 items-center">
+							<ActivityIndicator color="#f59e0b" />
+							<Text className="text-xs font-label text-muted-foreground mt-3">
+								Loading your projects…
+							</Text>
+						</View>
+					) : feedItems.length === 0 ? (
 						<Text className="home-empty-state text-center">
 							No projects yet. Upload a 2D floor plan to get started.
 						</Text>
 					) : (
-						feedItems.map((job) => <FeedCard key={job.id} job={job} />)
+						feedItems.map((job) => <FeedCard key={job.id} job={job} onChanged={refreshFeed} />)
 					)}
 				</View>
 			)}

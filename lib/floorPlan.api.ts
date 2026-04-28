@@ -34,3 +34,14 @@ export function getFloorPlanJob(id: string) {
 export function listMyFloorPlans() {
 	return apiRequest<FloorPlanJob[]>('/api/floor-plans/me');
 }
+
+export function renameFloorPlanJob(id: string, title: string) {
+	return apiRequest<FloorPlanJob>(`/api/floor-plans/${id}`, {
+		method: 'PATCH',
+		body: JSON.stringify({ title }),
+	});
+}
+
+export function deleteFloorPlanJob(id: string) {
+	return apiRequest<{ ok: true }>(`/api/floor-plans/${id}`, { method: 'DELETE' });
+}
