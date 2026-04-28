@@ -11,6 +11,7 @@ import {
 import { useFonts } from 'expo-font';
 import { Slot, SplashScreen } from 'expo-router';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '@/global.css';
 import { setAuthTokenGetter } from '@/lib/api';
 
@@ -53,9 +54,11 @@ export default function RootLayout() {
 	if (!fontsLoaded) return null;
 
 	return (
-		<ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-			<AuthTokenBridge />
-			<Slot />
-		</ClerkProvider>
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+				<AuthTokenBridge />
+				<Slot />
+			</ClerkProvider>
+		</GestureHandlerRootView>
 	);
 }
