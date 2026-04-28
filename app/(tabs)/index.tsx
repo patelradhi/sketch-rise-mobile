@@ -1,14 +1,14 @@
 /**
  * Home / Landing Tab
  *
- * This is the first tab users see. It shows the hero section,
- * "Start Building" button, and stats. Always public.
+ * Hero, primary CTAs, stats, upload card, and Projects feed.
  *
- * AUTH-AWARE BEHAVIOR:
- * - "Start Building" → if signed in, navigates to build screen.
- *   If not, redirects to /sign-in first.
- * - Header shows "Sign In" button or user avatar based on auth state.
- * - All other tabs (Product, Pricing, Community) are freely accessible.
+ * Behavior:
+ * - "Start Building" → scrolls to the upload card (or /sign-in if signed out).
+ * - "Watch Demo" → opens the DemoModal carousel.
+ * - Cross-tab CTAs (Product / Pricing) push to /?scroll=upload, which lands
+ *   here, jumps to the top, then smoothly scrolls to the upload card.
+ * - Header shows a Sign In pill when signed out, avatar menu when signed in.
  */
 
 import { useAuth, useClerk, useUser } from '@clerk/expo';

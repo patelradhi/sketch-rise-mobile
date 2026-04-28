@@ -1,14 +1,8 @@
 /**
  * Tab Navigator Layout
  *
- * NO AUTH GUARD — all tabs are public. Anyone can browse
- * Product, Pricing, Community without signing in.
- * Only "Start Building" on the Home tab requires sign-in.
- *
- * WHY Tabs from expo-router:
- * Expo Router's <Tabs> component reads every .tsx file in this
- * folder and creates one bottom tab for each. The tab bar
- * renders automatically at the bottom of every tab screen.
+ * No auth guard — all tabs (Home, Product, Pricing) are public.
+ * Generation actions inside the Home tab gate themselves on sign-in.
  */
 
 import { Tabs } from 'expo-router';
