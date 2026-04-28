@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { styled } from 'nativewind';
@@ -23,12 +24,7 @@ const PLANS: Plan[] = [
 		price: '$0',
 		period: 'forever',
 		tagline: 'Try every core feature, no credit card.',
-		features: [
-			'5 floor plans / month',
-			'Standard 3D rendering',
-			'PNG export',
-			'WhatsApp & Email share',
-		],
+		features: ['5 floor plans / month', 'Standard 3D rendering', 'PNG export', 'WhatsApp & Email share'],
 		cta: 'Get started',
 	},
 	{
@@ -65,7 +61,7 @@ const PLANS: Plan[] = [
 	},
 ];
 
-function PlanCard({ plan }: { plan: Plan }) {
+function PlanCard({ plan, onCta }: { plan: Plan; onCta: () => void }) {
 	const isPopular = plan.highlight === 'popular';
 	const isBest = plan.highlight === 'best';
 	const accentColor = isBest ? '#8fd1bd' : '#f59e0b';
@@ -90,9 +86,7 @@ function PlanCard({ plan }: { plan: Plan }) {
 				</View>
 			)}
 
-			<Text className="text-xs font-label uppercase tracking-[2px] text-muted-foreground mb-2">
-				{plan.name}
-			</Text>
+			<Text className="text-xs font-label uppercase tracking-[2px] text-muted-foreground mb-2">{plan.name}</Text>
 			<View className="flex-row items-baseline gap-2 mb-1">
 				<Text className="text-4xl font-display text-primary">{plan.price}</Text>
 				<Text className="text-sm font-label text-muted-foreground">{plan.period}</Text>
@@ -109,9 +103,7 @@ function PlanCard({ plan }: { plan: Plan }) {
 			</View>
 
 			<Pressable
-				onPress={() =>
-					Alert.alert('Coming soon', 'Subscriptions will activate in a future release.')
-				}
+				onPress={onCta}
 				className="rounded-xl py-3 items-center"
 				style={{
 					backgroundColor: isFilledCta ? accentColor : 'transparent',
@@ -119,10 +111,7 @@ function PlanCard({ plan }: { plan: Plan }) {
 					borderColor: 'rgba(245,158,11,0.3)',
 				}}
 			>
-				<Text
-					className="text-base font-heading"
-					style={{ color: isFilledCta ? '#0a0900' : '#f5f0e8' }}
-				>
+				<Text className="text-base font-heading" style={{ color: isFilledCta ? '#0a0900' : '#f5f0e8' }}>
 					{plan.cta}
 				</Text>
 			</Pressable>
@@ -131,6 +120,16 @@ function PlanCard({ plan }: { plan: Plan }) {
 }
 
 export default function Pricing() {
+	const router = useRouter();
+
+	const handleCta = (plan: Plan) => {
+		if (plan.id === 'free') {
+			router.push('/?scroll=upload' as never);
+		} else {
+			Alert.alert('Coming soon', 'Subscriptions will activate in a future release.');
+		}
+	};
+
 	return (
 		<SafeAreaView className="auth-safe-area">
 			<ScrollView
@@ -138,21 +137,25 @@ export default function Pricing() {
 				showsVerticalScrollIndicator={false}
 			>
 				<Text className="kicker-accent mb-3">PRICING</Text>
-				<Text className="text-4xl font-display text-primary leading-tight mb-3">
-					Pick a plan,{'\n'}start <Text className="text-accent">building</Text>.
+				<Text
+					className="text-3xl font-display text-primary leading-tight mb-3"
+					numberOfLines={1}
+					adjustsFontSizeToFit
+				>
+					Pick a plan, start <Text className="text-accent">building</Text>.
 				</Text>
 				<Text className="text-body mb-8">
 					Cancel anytime. Every plan includes core 3D generation. Upgrade only when you outgrow free.
 				</Text>
 
 				{PLANS.map((p) => (
-					<PlanCard key={p.id} plan={p} />
+					<PlanCard key={p.id} plan={p} onCta={() => handleCta(p)} />
 				))}
 
 				<View className="flex-row items-center justify-center gap-2 mt-3">
 					<Ionicons name="lock-closed-outline" size={12} color="rgba(245,240,232,0.5)" />
 					<Text className="text-xs font-label text-muted-foreground">
-						Secure billing  ·  Cancel anytime  ·  No hidden fees
+						Secure billing · Cancel anytime · No hidden fees
 					</Text>
 				</View>
 			</ScrollView>

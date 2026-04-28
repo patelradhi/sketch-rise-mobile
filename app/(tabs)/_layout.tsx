@@ -101,19 +101,6 @@ export default function TabsLayout() {
 					),
 				}}
 			/>
-			<Tabs.Screen
-				name="community"
-				options={{
-					title: 'Community',
-					tabBarIcon: ({ color, focused }) => (
-						<Ionicons
-							name={focused ? 'people' : 'people-outline'}
-							size={22}
-							color={color}
-						/>
-					),
-				}}
-			/>
 		</Tabs>
 	);
 }

@@ -7,12 +7,18 @@ import { styled } from 'nativewind';
 const SafeAreaView = styled(RNSafeAreaView);
 
 const FEATURES: { icon: keyof typeof Ionicons.glyphMap; title: string; desc: string }[] = [
-	{ icon: 'cube-outline', title: 'Photorealistic 3D', desc: 'Top-down architectural renders generated from any 2D plan.' },
-	{ icon: 'expand-outline', title: 'Pinch & Zoom', desc: 'Inspect every corner of your floor plan with smooth gestures.' },
-	{ icon: 'sparkles-outline', title: 'AI Powered', desc: 'Gemini parses rooms, walls, doors, and lighting automatically.' },
-	{ icon: 'image-outline', title: 'JPG / PNG Input', desc: 'Hand-drawn sketches or digital plans, both work.' },
+	{
+		icon: 'cube-outline',
+		title: 'Photorealistic 3D',
+		desc: 'Top-down architectural renders generated from any 2D plan.',
+	},
+	{
+		icon: 'sparkles-outline',
+		title: 'AI Powered',
+		desc: 'Gemini detects rooms, walls, doors, and lighting automatically.',
+	},
 	{ icon: 'cloud-download-outline', title: 'One-Tap Export', desc: 'Save renders straight to your device Photos.' },
-	{ icon: 'share-social-outline', title: 'Share Anywhere', desc: 'WhatsApp, Email, friendly preview-ready URLs.' },
+	{ icon: 'share-social-outline', title: 'Share Anywhere', desc: 'WhatsApp, Email, friendly preview-ready links.' },
 ];
 
 const STEPS = [
@@ -30,20 +36,18 @@ export default function Product() {
 				contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 120 }}
 				showsVerticalScrollIndicator={false}
 			>
-				{/* Hero */}
+				{/* Hero — single-row title */}
 				<Text className="kicker-accent mb-3">PRODUCT</Text>
 				<Text className="text-4xl font-display text-primary leading-tight mb-3">
-					Built for makers,{'\n'}<Text className="text-accent">refined</Text> for pros.
+					Made for <Text className="text-accent">makers</Text>
 				</Text>
 				<Text className="text-body mb-8">
 					Everything you need to turn a sketch into a beautiful 3D space — faster than your coffee gets cold.
 				</Text>
 
-				{/* Feature grid */}
-				<Text className="text-xs font-label uppercase tracking-[2px] text-muted-foreground mb-4">
-					Features
-				</Text>
-				<View className="flex-row flex-wrap" style={{ gap: 12 }}>
+				{/* Feature grid — 4 cards, 2 per row */}
+				<Text className="text-xs font-label uppercase tracking-[2px] text-muted-foreground mb-4">Features</Text>
+				<View className="flex-row flex-wrap" style={{ gap: 9 }}>
 					{FEATURES.map((f) => (
 						<View
 							key={f.title}
@@ -77,13 +81,12 @@ export default function Product() {
 					))}
 				</View>
 
-				{/* CTA */}
+				{/* CTA — pushes to home with a "scroll to upload" param */}
 				<Pressable
 					className="btn-primary mt-10 flex-row justify-center items-center gap-2"
-					onPress={() => router.push('/' as never)}
+					onPress={() => router.push('/?scroll=upload' as never)}
 				>
 					<Text className="btn-primary-text">Start Building</Text>
-					<Ionicons name="arrow-forward" size={18} color="#0a0900" />
 				</Pressable>
 			</ScrollView>
 		</SafeAreaView>
