@@ -37,10 +37,13 @@ export function ZoomableImage({ uri, onLoad }: Props) {
 
 	const pan = Gesture.Pan()
 		.onUpdate((e) => {
+			// only allow panning when the image is zoomed in past 1×
+			if (scale.value <= 1) return;
 			translateX.value = savedTranslateX.value + e.translationX;
 			translateY.value = savedTranslateY.value + e.translationY;
 		})
 		.onEnd(() => {
+			if (scale.value <= 1) return;
 			savedTranslateX.value = translateX.value;
 			savedTranslateY.value = translateY.value;
 		});
@@ -73,7 +76,7 @@ export function ZoomableImage({ uri, onLoad }: Props) {
 
 	return (
 		<GestureDetector gesture={composed}>
-			<Animated.View style={[{ flex: 1 }, animatedStyle]}>
+			<Animated.View style={[{ width: '100%', height: '100%' }, animatedStyle]}>
 				<Image
 					source={{ uri }}
 					style={{ width: '100%', height: '100%' }}
