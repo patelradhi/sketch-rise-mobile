@@ -37,10 +37,6 @@ export default function SignIn() {
 	const { signIn, setActive, isLoaded } = useSignIn();
 	const router = useRouter();
 
-	if (isSignedIn) {
-		return <Redirect href="/(tabs)" />;
-	}
-
 	const [form, setForm] = useState<SignInForm>({
 		emailAddress: '',
 		password: '',
@@ -53,6 +49,10 @@ export default function SignIn() {
 	});
 
 	const [showPassword, setShowPassword] = useState(false);
+
+	if (isSignedIn) {
+		return <Redirect href="/(tabs)" />;
+	}
 
 	const updateForm = (updates: Partial<SignInForm>) => setForm((prev) => ({ ...prev, ...updates }));
 

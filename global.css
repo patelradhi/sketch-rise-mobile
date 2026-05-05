@@ -255,11 +255,11 @@
 
 	/* ── Sign In Button (landing header) ── */
 	.btn-signin {
-		@apply rounded-lg bg-accent px-4 py-2 items-center;
+		@apply rounded-lg border border-accent/40 px-4 py-2 items-center;
 	}
 
 	.btn-signin-text {
-		@apply text-xs font-emphasis text-background;
+		@apply text-xs font-emphasis text-primary;
 	}
 
 	/* ── Floor Plan feature: shared accents ── */

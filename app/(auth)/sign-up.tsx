@@ -23,10 +23,6 @@ export default function SignUp() {
 	const { signUp, setActive, isLoaded } = useSignUp();
 	const router = useRouter();
 
-	if (isSignedIn) {
-		return <Redirect href="/(tabs)" />;
-	}
-
 	const [form, setForm] = useState<SignUpForm>({
 		emailAddress: '',
 		password: '',
@@ -39,6 +35,10 @@ export default function SignUp() {
 	});
 
 	const [showPassword, setShowPassword] = useState(false);
+
+	if (isSignedIn) {
+		return <Redirect href="/(tabs)" />;
+	}
 
 	const updateForm = (updates: Partial<SignUpForm>) =>
 		setForm((prev) => ({ ...prev, ...updates }));
