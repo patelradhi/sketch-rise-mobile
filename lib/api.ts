@@ -26,7 +26,13 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
 	};
 	if (token) headers.Authorization = `Bearer ${token}`;
 
-	const res = await fetch(`${BASE_URL}${path}`, { ...init, headers });
+	const method = init.method ?? 'GET';
+	const url = `${BASE_URL}${path}`;
+	const startedAt = Date.now();
+	console.log(`[api] → ${method} ${url}${token ? ' (auth)' : ' (no-auth)'}`);
+
+	const res = await fetch(url, { ...init, headers });
+	const ms = Date.now() - startedAt;
 
 	if (!res.ok) {
 		let body: { code?: string; message?: string } = {};
@@ -35,8 +41,10 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
 		} catch {
 			/* non-JSON error */
 		}
+		console.warn(`[api] ← ${method} ${url}  ${res.status}  ${ms}ms  ${body.code ?? 'http_error'}: ${body.message ?? res.statusText}`);
 		throw new ApiError(res.status, body.code ?? 'http_error', body.message ?? res.statusText);
 	}
 
+	console.log(`[api] ← ${method} ${url}  ${res.status}  ${ms}ms`);
 	return res.json() as Promise<T>;
 }

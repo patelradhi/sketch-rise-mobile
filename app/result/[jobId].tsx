@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { styled } from 'nativewind';
+import { BeforeAfterSlider } from '@/components/BeforeAfterSlider';
 import { ShareSheet } from '@/components/ShareSheet';
 import { RenameModal } from '@/components/RenameModal';
 import { ZoomableImage } from '@/components/ZoomableImage';
@@ -141,28 +142,13 @@ export default function ResultPage() {
 		<View className="flex-1 bg-background">
 			<StatusBar style="light" />
 			<SafeAreaView className="flex-1" edges={['top', 'bottom']}>
-				<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
-					{/* Top bar — back + 3-dot menu */}
-					<View className="flex-row items-center justify-between px-5 pt-3 pb-2">
-						<Pressable
-							onPress={handleBack}
-							className="size-10 rounded-xl bg-muted items-center justify-center"
-						>
-							<Ionicons name="chevron-back" size={20} color="#f5f0e8" />
-						</Pressable>
-
-						<Pressable
-							onPress={() => setMenuOpen((v) => !v)}
-							className="size-10 rounded-xl bg-muted items-center justify-center"
-							hitSlop={8}
-						>
-							<Ionicons name="ellipsis-vertical" size={18} color="#f5f0e8" />
-						</Pressable>
-					</View>
-
-					{/* Dropdown menu (rename / delete) */}
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					contentContainerStyle={{ paddingTop: 16, paddingBottom: 32 }}
+				>
+					{/* Dropdown menu (rename / delete) — anchored under the 3-dot button inside the wrapper */}
 					{menuOpen && (
-						<View className="absolute top-14 right-5 bg-card border border-border rounded-xl py-1 z-50 min-w-[160px]">
+						<View className="absolute top-20 right-10 bg-card border border-border rounded-xl py-1 z-50 min-w-[160px]">
 							<Pressable
 								className="flex-row items-center gap-3 px-4 py-3"
 								onPress={() => {
@@ -180,28 +166,50 @@ export default function ResultPage() {
 						</View>
 					)}
 
-					{/* Title + meta */}
-					<View className="px-6 pt-3 pb-5">
-						<Text className="kicker-accent mb-2">PROJECT</Text>
-						<Text className="text-3xl font-display text-primary leading-tight mb-2">{job.title}</Text>
-						<Text className="text-sm font-label text-muted-foreground">{metaParts.join('  ·  ')}</Text>
-					</View>
+					{/* Combined wrapper: project title + cream image card, bordered like the slider below */}
+					<View className="mx-5 bg-card border border-border rounded-3xl overflow-hidden">
+						{/* Header — matches the slider's header exactly: kicker + heading left, small element right */}
+						<View className="flex-row items-start justify-between px-5 pt-4 pb-3">
+							<View className="flex-1 pr-3">
+								<Text className="text-[10px] font-label text-muted-foreground tracking-widest">
+									PROJECT
+								</Text>
+								<Text className="text-lg font-heading text-primary mt-1" numberOfLines={1}>
+									{job.title}
+								</Text>
+							</View>
+							<Pressable onPress={() => setMenuOpen((v) => !v)} hitSlop={12} className="pt-1">
+								<Ionicons name="ellipsis-vertical" size={18} color="#8b8580" />
+							</Pressable>
+						</View>
 
-					{/* Cream image card with padding around the floor plan — pinch to zoom */}
-					<View className="mx-5 rounded-3xl p-4" style={{ backgroundColor: '#f5f0e8' }}>
-						<View
-							className="rounded-2xl overflow-hidden"
-							style={{ width: '100%', aspectRatio: (imageAspect ?? 4 / 3) * 0.7 }}
-						>
-							{job.generated3dUrl ? (
-								<ZoomableImage uri={job.generated3dUrl} onLoad={(w, h) => setImageAspect(w / h)} />
-							) : (
-								<View className="flex-1 items-center justify-center">
-									<Text className="text-xs font-label text-muted-foreground">No render yet</Text>
-								</View>
-							)}
+						{/* Cream image card — sits inside the bordered wrapper */}
+						<View className="mx-3 mb-3 rounded-2xl p-4" style={{ backgroundColor: '#f5f0e8' }}>
+							<View
+								className="rounded-xl overflow-hidden"
+								style={{ width: '100%', aspectRatio: (imageAspect ?? 4 / 3) * 0.7 }}
+							>
+								{job.generated3dUrl ? (
+									<ZoomableImage uri={job.generated3dUrl} onLoad={(w, h) => setImageAspect(w / h)} />
+								) : (
+									<View className="flex-1 items-center justify-center">
+										<Text className="text-xs font-label text-muted-foreground">No render yet</Text>
+									</View>
+								)}
+							</View>
 						</View>
 					</View>
+
+					{/* Before/After comparison slider — shown below the cream card when both images exist */}
+					{job.source2dUrl && job.generated3dUrl && (
+						<View className="px-5 mt-5">
+							<BeforeAfterSlider
+								beforeUri={job.source2dUrl}
+								afterUri={job.generated3dUrl}
+								aspectRatio={(imageAspect ?? 4 / 3) * 0.7}
+							/>
+						</View>
+					)}
 
 					{/* Stats chips — shown only when we have structure data */}
 					{(stats.sqft || stats.roomCount > 0 || job.generated3dUrl) && (
@@ -222,15 +230,6 @@ export default function ResultPage() {
 							</View>
 						</View>
 					)}
-
-					{/* Primary CTA */}
-					<Pressable
-						className="mx-5 mt-5 flex-row items-center justify-center gap-2 bg-accent rounded-2xl py-4"
-						onPress={() => Alert.alert('Coming soon', 'Interactive 3D viewer is on the way.')}
-					>
-						<Ionicons name="cube-outline" size={20} color="#0a0900" />
-						<Text className="text-base font-heading text-background">Build in 3D</Text>
-					</Pressable>
 				</ScrollView>
 
 				{/* Sticky bottom footer — Export + Share */}

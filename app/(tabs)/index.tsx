@@ -178,21 +178,16 @@ export default function Home() {
 					)}
 				</View>
 
-				{/* ── Badge ── */}
-				<View className="badge-pill mb-8">
-					<Text className="badge-pill-text">Powered by Claude AI</Text>
-				</View>
-
 				{/* ── Hero ── */}
-				<Text className="heading-hero mb-4">
+				<Text className="heading-hero mb-4 mt-4">
 					Turn your sketch{'\n'}into a <Text className="text-accent">3D space</Text>
 					{'\n'}instantly.
 				</Text>
 
 				{/* ── Subtitle ── */}
 				<Text className="auth-subtitle self-center mb-10">
-					Upload any hand-drawn or digital floor plan. Claude AI parses the layout and React Three Fiber
-					builds a photorealistic 3D visualization in seconds.
+					Upload any hand-drawn or digital floor plan. Our AI parses the layout and renders a
+					photorealistic 3D visualization in seconds.
 				</Text>
 
 				{/* ── Buttons ── */}
