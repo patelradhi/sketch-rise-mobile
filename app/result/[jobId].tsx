@@ -15,26 +15,6 @@ import { deleteFloorPlanJob, getFloorPlanJob, renameFloorPlanJob, type FloorPlan
 
 const SafeAreaView = styled(RNSafeAreaView);
 
-interface Structure {
-	rooms?: Array<{ type?: string }>;
-	total_area_sqm?: number;
-}
-
-function formatDate(iso: string): string {
-	const d = new Date(iso);
-	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-	return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
-
-function deriveStats(structure: unknown) {
-	const s = (structure ?? null) as Structure | null;
-	const rooms = s?.rooms ?? [];
-	const beds = rooms.filter((r) => r.type === 'bedroom').length;
-	const baths = rooms.filter((r) => r.type === 'bathroom').length;
-	const sqft = s?.total_area_sqm ? Math.round(s.total_area_sqm * 10.764) : null;
-	return { beds, baths, sqft, roomCount: rooms.length };
-}
-
 export default function ResultPage() {
 	const { jobId } = useLocalSearchParams<{ jobId: string }>();
 	const router = useRouter();
@@ -132,12 +112,6 @@ export default function ResultPage() {
 		);
 	}
 
-	const stats = deriveStats(job.structure);
-	const metaParts: string[] = [];
-	if (stats.beds > 0) metaParts.push(`${stats.beds} bed${stats.beds === 1 ? '' : 's'}`);
-	if (stats.baths > 0) metaParts.push(`${stats.baths} bath${stats.baths === 1 ? '' : 's'}`);
-	metaParts.push(formatDate(job.createdAt));
-
 	return (
 		<View className="flex-1 bg-background">
 			<StatusBar style="light" />
@@ -211,25 +185,6 @@ export default function ResultPage() {
 						</View>
 					)}
 
-					{/* Stats chips — shown only when we have structure data */}
-					{(stats.sqft || stats.roomCount > 0 || job.generated3dUrl) && (
-						<View className="flex-row gap-3 px-5 mt-5">
-							<View className="flex-1 bg-card rounded-2xl py-4 items-center">
-								<Text className="text-xl font-heading text-accent">{stats.sqft ?? '—'}</Text>
-								<Text className="text-[11px] font-label text-muted-foreground mt-2">sq ft</Text>
-							</View>
-							<View className="flex-1 bg-card rounded-2xl py-4 items-center">
-								<Text className="text-xl font-heading text-accent">
-									{stats.roomCount > 0 ? stats.roomCount : '—'}
-								</Text>
-								<Text className="text-[11px] font-label text-muted-foreground mt-0.5">rooms</Text>
-							</View>
-							<View className="flex-1 bg-card rounded-2xl py-4 items-center">
-								<Text className="text-xl font-heading text-accent">3D</Text>
-								<Text className="text-[11px] font-label text-muted-foreground mt-0.5">ready</Text>
-							</View>
-						</View>
-					)}
 				</ScrollView>
 
 				{/* Sticky bottom footer — Export + Share */}
